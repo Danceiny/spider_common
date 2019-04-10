@@ -1,0 +1,4 @@
+
+
+class ApiCallException(RuntimeError):
+    pass

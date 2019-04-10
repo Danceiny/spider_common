@@ -1,8 +1,12 @@
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
-from ..models import ClueModel
+from ..api import ClueApi
 
 
 class ClueRetryMiddleware(RetryMiddleware):
+    @classmethod
+    def from_crawler(cls, crawler):
+        cls.api = ClueApi()
+
     def _retry(self, request, reason, spider):
         ret = super()._retry(request, reason, spider)
         if ret:
@@ -10,9 +14,9 @@ class ClueRetryMiddleware(RetryMiddleware):
         # failed clue
         clue_id = request.meta.get('clue_id')
         if clue_id:
-            clue = ClueModel.get_by_id(clue_id)
-            if clue.status == 200:
+            clue = self.api.get_by_id(clue_id)
+            if clue['status'] == 200:
                 spider.debug("!!!retry a successful clue!!!")
             else:
                 clue.fail()
-                clue.save()
+                self.api.update(clue)

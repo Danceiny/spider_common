@@ -8,7 +8,28 @@ from parser_engine.config import mysqldb
 from .constants import ClueStatus
 
 
-class ClueModel(Model):
+class ClueTrait:
+    def success(self):
+        self.finished_time = int(time.time())
+        self.status = ClueStatus.SUCCESS
+
+    def fail(self):
+        # 已经失败过的，用status++表示重试次数
+        if self.status >= ClueStatus.FAILED:
+            self.status += 1
+        else:
+            self.status = ClueStatus.FAILED
+
+
+class Clue(ClueTrait, dict):
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def __getattr__(self, item):
+        return self.get(item)
+
+
+class ClueModel(ClueTrait, Model):
     id = PrimaryKeyField()
     status = IntegerField(verbose_name="状态", default=0)
     created_time = IntegerField(verbose_name="创建时间", default=0)
@@ -37,14 +58,3 @@ class ClueModel(Model):
         model.from_clue_id = item.get('from_clue_id', 0)
         model.req = json.dumps(item.get('req'))
         return model
-
-    def success(self):
-        self.finished_time = int(time.time())
-        self.status = ClueStatus.SUCCESS
-
-    def fail(self):
-        # 已经失败过的，用status++表示重试次数
-        if self.status >= ClueStatus.FAILED:
-            self.status += 1
-        else:
-            self.status = ClueStatus.FAILED
