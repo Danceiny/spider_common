@@ -4,7 +4,7 @@ import time
 import requests
 from scrapy import signals
 from ...constants.signals import SignalEnum
-
+from spider_common.common_utils.time import get_unixtimestamp
 logger = logging.getLogger(__name__)
 
 DEFUALT_SIGNALS_TO_NOTIFY = [
@@ -26,6 +26,9 @@ class SignalHandler(object):
         v1 2019-04-03
         POST application/json
         {"title":"","content":""}
+        v2 2019-04-12
+        POST application/json
+        {"title":"","content":"","ts":0}
         """
         self.api = api
 
@@ -71,7 +74,8 @@ class SignalHandler(object):
         logger.error(content)
         self.send_notification({
             "title": "{} Spider Error".format(spider.name),
-            "content": content
+            "content": content,
+            "ts": get_unixtimestamp()
         })
 
     def item_error(self, item, response, spider, failure):
@@ -81,25 +85,29 @@ class SignalHandler(object):
             json.dumps(dict(**item)), )
         self.send_notification({
             "title": "{1} Spider {1} item error".format(spider.name, type(item).__name__),
-            "content": content
+            "content": content,
+            "ts": get_unixtimestamp()
         })
 
     def spider_opened(self, spider):
         content = "opened spider {}".format(spider.name)
         self.send_notification({
             "title": "{} Spider Opened".format(spider.name),
-            "content": content
+            "content": content,
+            "ts": get_unixtimestamp()
         })
 
     def spider_closed(self, spider, reason):
         content = "closed spider {}, reason: {}".format(spider.name, reason)
         self.send_notification({
             "title": "{} Spider Closed".format(spider.name),
-            "content": content
+            "content": content,
+            "ts": get_unixtimestamp()
         })
 
     def spider_idle(self, spider):
         self.send_notification({
             "title": "{} Spider turn idle".format(spider.name),
-            "content": ""
+            "content": "",
+            "ts": get_unixtimestamp()
         })
