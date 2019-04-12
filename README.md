@@ -9,6 +9,8 @@ Common code used in python spider.
     >与clue相关的代码
 - notify
     >事件、信号通知相关的代码
+- persistent
+    >抓取数据持久化
     
 代码结构：
 ```

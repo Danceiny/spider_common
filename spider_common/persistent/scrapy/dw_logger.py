@@ -5,14 +5,14 @@ from six.moves.urllib.parse import (urlencode)
 
 from parser_engine.patch import get_redis
 from parser_engine.singleton import Singleton
+from parser_engine.utils import load_scrapy_settings
 
 
 @Singleton
 class DwLogger:
-    def __init__(self, write_filename='dw_local.txt'):
-        from scrapy.utils import project
-        settings = project.get_project_settings()
-        self.r = get_redis(**settings.getdict('REDIS_PARAMS'))
+    def __init__(self, settings=None, write_filename='dw_local.txt'):
+        settings = settings if settings else load_scrapy_settings()
+        self.r = get_redis(**settings.get('REDIS_PARAMS', {"url": "redis://127.0.0.1:6379"}))
         self.ENV = settings.get('ENV')
         if write_filename:
             self.f = open(write_filename, 'a+')
@@ -20,7 +20,7 @@ class DwLogger:
             self.f = None
 
     def __del__(self):
-        if self.f:
+        if getattr(self, 'f', None):
             self.f.close()
 
     def log_to_dw(self, action, **data):
