@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import requests
-from six.moves.urllib.parse import (urlencode)
+from six.moves.urllib.parse import (urlencode, urljoin)
 
 from parser_engine.patch import get_redis
 from parser_engine.singleton import Singleton
@@ -19,23 +19,23 @@ class DwLogger:
         else:
             self.f = None
 
+        conf = settings.get('DW_EVENTLOG_CONFIG', {}).copy()
+        url = conf.pop('url')
+        self.eventlog_common_data = conf
+        self.eventlog_base_url = url if url.endswith('/') else url + '/'
+
     def __del__(self):
         if getattr(self, 'f', None):
             self.f.close()
 
     def log_to_dw(self, action, **data):
+        # dev环境才打数据到dw, local环境直接写文件
         if self.ENV == 'local':
             if self.f:
                 self.f.write(json.dumps(data) + '\n')
             return
-
-        # dev环境才打数据到dw
-        data['event_type'] = 'bxmainsite_aux'
-        data['site_id'] = 'bx_crawler'
-        data['tracktype'] = 'event'
-        data['__debug'] = 1
-        url = 'https://www.baixing.com/c/aux/' + action + '?' + urlencode(data)
-
+        data.update(self.eventlog_common_data)
+        url = self.eventlog_base_url + action + '?' + urlencode(data)
         resp = requests.get(url)
         retry_times = 2
         while retry_times > 0 and resp.status_code != requests.codes.ok:

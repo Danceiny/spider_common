@@ -20,6 +20,18 @@ class ClueTrait:
         else:
             self.status = ClueStatus.FAILED
 
+    @classmethod
+    def from_item(cls, item):
+        model = cls()
+        model.url = item.get('url', item.get('req', {}).get('url'))
+        model.name = item.get('business') or item.get('spider') or ''
+        model.channel = item.get('channel') or item.get('project') or ''
+        model.created_time = int(time.time())
+        model.modified_time = int(time.time())
+        model.from_clue_id = item.get('from_clue_id', 0)
+        model.req = json.dumps(item.get('req'))
+        return model
+
 
 class Clue(ClueTrait, dict):
     def __setattr__(self, key, value):
@@ -27,6 +39,21 @@ class Clue(ClueTrait, dict):
 
     def __getattr__(self, item):
         return self.get(item)
+
+    @classmethod
+    def from_item(cls, item):
+        """
+        create api POST /api/v1/schedule
+        :param item: scrapy.item.Item or return value of parser_engine.utils.item2dict(item)
+        :return:
+        """
+        model = cls()
+        model.url = item.get('url')
+        model.name = item.get('business') or item.get('spider') or ''
+        model.channel = item.get('channel') or item.get('project') or ''
+        model.from_clue_id = item.get('from_clue_id', 0)
+        model.update(item.get('req', {}))  # parser_engine.request.TaskRequest
+        return model
 
 
 class ClueModel(ClueTrait, Model):
@@ -46,15 +73,3 @@ class ClueModel(ClueTrait, Model):
     class Meta:
         table_name = 'clue'
         database = mysqldb
-
-    @staticmethod
-    def from_item(item):
-        model = ClueModel()
-        model.url = item.get('url', item.get('req', {}).get('url'))
-        model.name = item.get('business') or item.get('spider') or ''
-        model.channel = item.get('channel') or item.get('project') or ''
-        model.created_time = int(time.time())
-        model.modified_time = int(time.time())
-        model.from_clue_id = item.get('from_clue_id', 0)
-        model.req = json.dumps(item.get('req'))
-        return model

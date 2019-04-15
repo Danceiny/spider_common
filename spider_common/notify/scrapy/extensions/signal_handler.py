@@ -7,7 +7,7 @@ from ...constants.signals import SignalEnum
 from spider_common.common_utils.time import get_unixtimestamp
 logger = logging.getLogger(__name__)
 
-DEFUALT_SIGNALS_TO_NOTIFY = [
+DEFAULT_SIGNALS_TO_NOTIFY = [
     SignalEnum.ENGINE_STARTED,
     SignalEnum.ENGINE_STOPPED,
     SignalEnum.SPIDER_CLOSED,
@@ -44,7 +44,7 @@ class SignalHandler(object):
             if cb and callable(cb):
                 crawler.signals.connect(cb, signal=getattr(signals, signal_lower_name))
 
-        signals_config = settings.get('SIGNALS_ALLOW_TO_NOTIFY', DEFUALT_SIGNALS_TO_NOTIFY)
+        signals_config = settings.get('SIGNALS_ALLOW_TO_NOTIFY', DEFAULT_SIGNALS_TO_NOTIFY)
         if signals_config is None:
             for signal_enum in SignalEnum:
                 add_signal_callback(signal_enum)

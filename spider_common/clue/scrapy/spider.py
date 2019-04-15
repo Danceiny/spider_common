@@ -6,7 +6,7 @@ class ClueSpider(PESpider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         obj = super(ClueSpider, cls).from_crawler(crawler, *args, **kwargs)
-        obj.api = ClueApi()
+        cls.api = ClueApi()
         return obj
 
     def finish_clue(self, response, dw_count=0):

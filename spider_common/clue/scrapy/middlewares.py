@@ -3,9 +3,9 @@ from ..api import ClueApi
 
 
 class ClueRetryMiddleware(RetryMiddleware):
-    @classmethod
-    def from_crawler(cls, crawler):
-        cls.api = ClueApi()
+    def __init__(self, settings):
+        super().__init__(settings)
+        self.api = ClueApi()
 
     def _retry(self, request, reason, spider):
         ret = super()._retry(request, reason, spider)
