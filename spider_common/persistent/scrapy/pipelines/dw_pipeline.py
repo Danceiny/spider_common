@@ -1,6 +1,7 @@
-from .dw_logger import DwLogger
+from ..dw_logger import DwLogger
 from parser_engine.itemclassloader import ItemClassLoader
 from parser_engine.utils import load_scrapy_settings
+from spider_common.common_utils.exceptions import InitArgsException
 
 
 class DwPipeline(object):
@@ -17,8 +18,9 @@ class DwPipeline(object):
 
         self.setup_from_settings(settings=settings if settings else load_scrapy_settings())
         if action and item_cls:
+            cls = self.item_loader.load(item_cls)
             self.item_configs.update({
-                action: self.item_loader.get(item_cls),
+                action: cls,
             })
 
     def setup_from_settings(self, settings):
@@ -28,7 +30,10 @@ class DwPipeline(object):
         if conf:
             item_configs = {}
             for action, item_cls in conf.items():
-                item_configs[action] = self.item_loader.get(item_cls)
+                cls = self.item_loader.load(item_cls)
+                if not cls:
+                    raise InitArgsException("item class %s not found" % item_cls)
+                item_configs[action] = cls
             self.item_configs = item_configs
 
     def process_item(self, item, spider):

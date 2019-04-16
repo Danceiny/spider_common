@@ -10,7 +10,7 @@ class CluePersistentPipeline(object):
 
     def process_item(self, item, spider):
         if isinstance(item, ClueItem):
-            clue = self.api.create(Clue.from_item(item))
+            clue = self.api.create(Clue.from_item(item))[0]
             item['req'].meta['clue_id'] = clue.id
             spider.info('CluePersistentPipeline save clue {clue_id} to database'
                         .format(clue_id=item['req'].meta.get('clue_id')))

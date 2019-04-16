@@ -56,14 +56,14 @@ class Clue(ClueTrait, dict):
         return model
 
 
-class ClueModel(ClueTrait, Model):
+class ClueTable(ClueTrait, Model):
     id = PrimaryKeyField()
     status = IntegerField(verbose_name="状态", default=0)
     created_time = IntegerField(verbose_name="创建时间", default=0)
     modified_time = IntegerField(verbose_name="更新时间", default=0)
     finished_time = IntegerField(verbose_name="完成时间", default=0)
-    channel = CharField(verbose_name="渠道名称", max_length=20, default='')
-    name = CharField(verbose_name="业务名称", max_length=20, default='')
+    channel = CharField(verbose_name="渠道名称", max_length=32, default='')
+    name = CharField(verbose_name="业务名称", max_length=32, default='')
     url = CharField(verbose_name="爬取url", max_length=500, default='')
     from_clue_id = IntegerField(verbose_name="来源clue的id", default=0)
     req = CharField(verbose_name="请求体", max_length=4096, default='')
