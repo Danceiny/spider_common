@@ -12,7 +12,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     license="MIT",
-    url="https://gitlab.baixing.cn/spider/spider-common",
+    url="https://gitlab.baixing.cn/spider/spider_common",
     packages=find_packages(),
     install_requires=[
         "six",
