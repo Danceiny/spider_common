@@ -6,6 +6,19 @@ from six.moves.urllib.parse import (urlencode, urljoin)
 from parser_engine.patch import get_redis
 from parser_engine.singleton import Singleton
 from parser_engine.utils import load_scrapy_settings
+import logging
+
+logger = logging.getLogger("dw_logger")
+
+
+def log_to_dw(eventlog_base_url, action, **data):
+    url = eventlog_base_url + action + '?' + urlencode(data)
+    retry_times = 2
+    while retry_times > 0:
+        resp = requests.get(url)
+        if resp.status_code == requests.codes.ok:
+            return True
+        retry_times -= 1
 
 
 @Singleton
@@ -36,13 +49,9 @@ class DwLogger:
                 self.active_fp[action].write(json.dumps(data) + '\n')
             return
         data.update(self.eventlog_common_data)
-        url = self.eventlog_base_url + action + '?' + urlencode(data)
-        resp = requests.get(url)
-        retry_times = 2
-        while retry_times > 0 and resp.status_code != requests.codes.ok:
-            resp = requests.get(url)
-            retry_times -= 1
 
-        if resp.status_code != requests.codes.ok:
+        if log_to_dw(self.eventlog_base_url, action, **data):
+            logger.info("%s success" % action)
+        else:
             # 错误暂时记在redis中
             self.r.set('faillog:dw:' + action, json.dumps(data))

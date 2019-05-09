@@ -13,7 +13,6 @@ DEFAULT_SIGNALS_TO_NOTIFY = [
     SignalEnum.SPIDER_CLOSED,
     SignalEnum.SPIDER_ERROR,
     SignalEnum.SPIDER_OPENED,
-    SignalEnum.ITEM_ERROR,
 ]
 
 
