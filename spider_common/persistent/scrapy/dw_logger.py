@@ -12,6 +12,9 @@ logger = logging.getLogger("dw_logger")
 
 
 def log_to_dw(eventlog_base_url, action, **data):
+    for k, v in data.items():
+        if v is None:
+            data[k] = ''
     url = eventlog_base_url + action + '?' + urlencode(data)
     retry_times = 2
     while retry_times > 0:
