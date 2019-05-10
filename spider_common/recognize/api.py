@@ -90,30 +90,41 @@ class Api:
             }
         :return: dict
             {
-                'index1': {
-                    label: "联系方式",
-                    status: "accept",
-                    probability: 0.95,
-                    content: [
-                        {value:17717540902, probability: 0.95},
-                        {value:78087654, probability: 0.90}
-                    ]
+                'recognizeId': 'chr:5cd52e4b33792f514c3b990a',
+                'contentDecision': {
+                    'label': '联系方式',
+                    'probability': 1,
+                    'content': [
+                        {'entity': 'tanceiny', 'entityType': 'Weixin'}
+                    ],
+                    'status': 'accept',
+                    'info': {'message': '内容涉及“联系方式”'}
                 },
-                'index2': {
-                    label: "正常",
-                    status: "accept",
-                    probability: 1
+                'contentDecisionDetail': {
+                    '1': {
+                            'contact':
+                                {
+                                    'content': [
+                                        {'entity': 'tanceiny', 'entityType': 'Weixin'}
+                                    ],
+                                    'label': '联系方式',
+                                    'probability': 1,
+                                    'status': 'accept',
+                                    'info': {'message': '内容涉及“联系方式”'}
+                                }
+                         }
                 }
             }
-        """
-        data = {
-            'bizChannel': self.biz_channel,
-            'recognizeType': 'contacts',
-            'valueType': 'text',
-            'values': values
-        }
 
-        return self._api('Quality.recognizeContentV2', data)
+        """
+        content = {}
+        for index, text in values.items():
+            content[index] = {
+                'type': 'text',
+                'value': text,
+                'recognizeTypes': ['contact']
+            }
+        return self.robot_recognize_content_v2(content)
 
     @params_type_check
     def upload_customer_decision(self, recognize_id: str, status: str, label: str) -> bool:
