@@ -7,5 +7,6 @@ class ShopItem(BaseItem):
     address = Field()
     cellphone = Field()
     telephone = Field()
-
-
+    qq = Field()
+    wechat = Field()
+    extra = Field()

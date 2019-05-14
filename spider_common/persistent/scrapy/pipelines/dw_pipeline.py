@@ -40,5 +40,9 @@ class DwPipeline(object):
         if self.item_configs:
             for action, item_cls in self.item_configs.items():
                 if isinstance(item, item_cls):
-                    self.logger.log_to_dw(action, **item)
+                    unpack_method = getattr(item, 'unpack_to_dict', None)
+                    if callable(unpack_method):
+                        self.logger.log_to_dw(action, **item.unpack_to_dict())
+                    else:
+                        self.logger.log_to_dw(action, **item)
         return item

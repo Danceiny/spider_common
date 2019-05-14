@@ -10,11 +10,13 @@ class ShopTable(Model):
     src = CharField(verbose_name="来源渠道", max_length=32, default='')  # 约定的统一名称
     src_id = CharField(verbose_name="来源渠道的原始id", max_length=64, default='')
     name = CharField(verbose_name="店铺名称", max_length=64, default='')
-    cellphone = CharField(verbose_name="手机", max_length=64, default=0)
-    city = CharField(verbose_name="状态", max_length=32, default=0)
-    address = CharField(verbose_name="创建时间", max_length=255, default=0)
-    telephone = CharField(verbose_name="固定电话", max_length=64, default=0)
+    cellphone = CharField(verbose_name="手机", max_length=64, default='')
+    qq = CharField(verbose_name="QQ", max_length=64, default='')
+    city = CharField(verbose_name="状态", max_length=32, default='')
+    address = CharField(verbose_name="创建时间", max_length=255, default='')
+    telephone = CharField(verbose_name="固定电话", max_length=64, default='')
     channel = CharField(verbose_name="业务渠道", max_length=32, default='')
+    extra = CharField(verbose_name='其他', max_length=10000, default='')
 
     class Meta:
         table_name = 'shop'
