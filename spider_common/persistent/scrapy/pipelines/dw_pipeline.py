@@ -2,6 +2,9 @@ from ..dw_logger import DwLogger
 from parser_engine.itemclassloader import ItemClassLoader
 from parser_engine.utils import load_scrapy_settings
 from spider_common.common_utils.exceptions import InitArgsException
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class DwPipeline(object):
@@ -15,8 +18,11 @@ class DwPipeline(object):
         self.item_loader = None
         self.logger = None
         self.item_configs = None
-
-        self.setup_from_settings(settings=settings if settings else load_scrapy_settings())
+        try:
+            self.setup_from_settings(settings=settings if settings else load_scrapy_settings())
+        except InitArgsException as e:
+            logger.error(str(e))
+            exit()
         if action and item_cls:
             cls = self.item_loader.load(item_cls)
             self.item_configs.update({
