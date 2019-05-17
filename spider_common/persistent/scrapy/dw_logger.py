@@ -18,9 +18,14 @@ def log_to_dw(eventlog_base_url, action, **data):
     url = eventlog_base_url + action + '?' + urlencode(data)
     retry_times = 2
     while retry_times > 0:
-        resp = requests.get(url)
-        if resp.status_code == requests.codes.ok:
-            return True
+        try:
+            resp = requests.get(url)
+            if resp.status_code == requests.codes.ok:
+                return True
+            else:
+                logger.warning("【%s】 log_to_dw failed, response status: %s", action, resp.status_code)
+        except Exception as e:
+            logger.error("【%s】 log_to_dw %s request exception: %s", action, str(e))
         retry_times -= 1
 
 
@@ -57,4 +62,4 @@ class DwLogger:
             logger.info("%s success" % action)
         else:
             # 错误暂时记在redis中
-            self.r.set('faillog:dw:' + action, json.dumps(data))
+            self.r.lpush('faillog:dw:' + action, json.dumps(data))
